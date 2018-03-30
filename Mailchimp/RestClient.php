@@ -31,7 +31,7 @@ class RestClient
      * @param string $apiCall the API call function
      * @param array $payload Parameters
      * @param boolean $export indicate wether API used is Export API or not
-     * @return array
+     * @return string
      */
     protected function requestMonkey($apiCall, $payload, $export = false)
     {
@@ -51,7 +51,7 @@ class RestClient
         );
         $response = $browser->post($url, $headers, $payload);
 
-        return $response->getContent();
+        return $response->getBody()->getContents();
     }
 
     /**
@@ -60,10 +60,13 @@ class RestClient
      */
     private function prepareCurl()
     {
-        $curl = new Curl();
-        $curl->setOption(CURLOPT_USERAGENT, 'HypeMailchimp');
-        $curl->setVerifyPeer(false);
-        $curl->setTimeout($this->config['timeout']);
+        $options = array(
+            CURLOPT_USERAGENT => 'HypeMailchimp',
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_TIMEOUT => $this->config['timeout']
+        );
+        $curl = new Curl($options);
+
         return $curl;
     }
 
